@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  iris-app:
+    build: .
+    ports:
+      - "8000:8000"
+    # opcjonalnie, jeśli chcesz mieć dostęp do logów lub debugować:
+    # volumes:
+    #   - .:/app:ro
