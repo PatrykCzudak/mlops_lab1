@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Iris Prediction</title>
+  <style>
+    body { font-family: sans-serif; max-width: 400px; margin: 2rem auto; }
+    label { display: block; margin: 0.5rem 0; }
+    input { width: 100%; padding: 0.3rem; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; }
+    #result { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Iris Prediction</h1>
+  <form id="predict-form">
+    <label>Sepal Length:
+      <input type="number" step="any" id="sepal_length" required>
+    </label>
+    <label>Sepal Width:
+      <input type="number" step="any" id="sepal_width" required>
+    </label>
+    <label>Petal Length:
+      <input type="number" step="any" id="petal_length" required>
+    </label>
+    <label>Petal Width:
+      <input type="number" step="any" id="petal_width" required>
+    </label>
+    <button type="submit">Predict</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("predict-form")
+      .addEventListener("submit", async e => {
+        e.preventDefault();
+        const payload = {
+          sepal_length:  parseFloat(document.getElementById("sepal_length").value),
+          sepal_width:   parseFloat(document.getElementById("sepal_width").value),
+          petal_length:  parseFloat(document.getElementById("petal_length").value),
+          petal_width:   parseFloat(document.getElementById("petal_width").value),
+        };
+        try {
+          const res = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(await res.text());
+          const { prediction } = await res.json();
+          document.getElementById("result")
+                  .textContent = `Prediction: ${prediction}`;
+        } catch (err) {
+          document.getElementById("result")
+                  .textContent = `Błąd: ${err.message}`;
+        }
+      });
+  </script>
+</body>
+</html>

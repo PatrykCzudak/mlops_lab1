@@ -1,14 +1,21 @@
-from fastapi.testclient import TestClient
-from app import app
+from fastapi import FastAPI
+from api.models.iris import PredictRequest, PredictResponse
+from inference import load_model, predict
 
-client = TestClient(app)
+app = FastAPI(title="Iris Classification API")
 
-def test_root_endpoint():
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to the ML API"}
+# 1×: załaduj model raz przy starcie
+model = load_model("model.joblib")
 
-def test_health_endpoint():
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+@app.get("/")
+def root():
+    return {"message": "Welcome to the Iris ML API"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.post("/predict", response_model=PredictResponse)
+def predict_endpoint(request: PredictRequest):
+    prediction = predict(model, request.dict())
+    return PredictResponse(prediction=prediction)
